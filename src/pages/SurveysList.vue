@@ -36,25 +36,25 @@
       <table class="min-w-full text-sm">
         <thead class="bg-slate-800 text-slate-300">
           <tr>
-            <th
+            <!-- <th
               class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('surveyId')"
             >
               Survey ID
               <SortIcon :active="sortKey === 'surveyId'" :dir="sortDir" />
-            </th>
+            </th> -->
             <th
               class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('qrId')"
             >
               QR <SortIcon :active="sortKey === 'qrId'" :dir="sortDir" />
             </th>
-            <th
+            <!-- <th
               class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('sysId')"
             >
               sysId <SortIcon :active="sortKey === 'sysId'" :dir="sortDir" />
-            </th>
+            </th> -->
             <th
               class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('name')"
@@ -63,17 +63,26 @@
             </th>
             <th
               class="px-3 py-2 text-left cursor-pointer"
-              @click="setSort('email')"
-            >
-              Email <SortIcon :active="sortKey === 'email'" :dir="sortDir" />
-            </th>
-            <th
-              class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('company')"
             >
               Company
               <SortIcon :active="sortKey === 'company'" :dir="sortDir" />
             </th>
+            <th
+              class="px-3 py-2 text-left cursor-pointer"
+              @click="setSort('phoneNumber')"
+            >
+              Phone
+              <SortIcon :active="sortKey === 'phoneNumber'" :dir="sortDir" />
+            </th>
+            <th
+              class="px-3 py-2 text-left cursor-pointer"
+              @click="setSort('interest')"
+            >
+              Interest
+              <SortIcon :active="sortKey === 'interest'" :dir="sortDir" />
+            </th>
+
             <th
               class="px-3 py-2 text-left cursor-pointer"
               @click="setSort('submittedAt')"
@@ -90,12 +99,12 @@
             :key="s.surveyId"
             class="border-t border-slate-800"
           >
-            <td class="px-3 py-2">{{ s.surveyId }}</td>
             <td class="px-3 py-2">{{ s.qrId }}</td>
-            <td class="px-3 py-2">{{ s.sysId }}</td>
             <td class="px-3 py-2">{{ s.name }}</td>
-            <td class="px-3 py-2">{{ s.email }}</td>
             <td class="px-3 py-2">{{ s.company }}</td>
+            <td class="px-3 py-2">{{ s.phoneNumber }}</td>
+            <td class="px-3 py-2">{{ s.interest }}</td>
+            <!-- <td class="px-3 py-2">{{ s.company }}</td> -->
             <td class="px-3 py-2">{{ formatDate(s.submittedAt) }}</td>
             <td class="px-3 py-2">
               <RouterLink

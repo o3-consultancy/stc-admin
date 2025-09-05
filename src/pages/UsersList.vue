@@ -44,13 +44,14 @@
             </th>
             <th
               class="px-3 py-2 text-left cursor-pointer"
-              @click="setSort('email')"
+              @click="setSort('company')"
             >
-              Email <SortIcon :active="sortKey === 'email'" :dir="sortDir" />
+              Company
+              <SortIcon :active="sortKey === 'company'" :dir="sortDir" />
             </th>
             <th
               class="px-3 py-2 text-left cursor-pointer"
-              @click="setSort('phone')"
+              @click="setSort('phoneNumber')"
             >
               Phone <SortIcon :active="sortKey === 'phone'" :dir="sortDir" />
             </th>
@@ -82,18 +83,20 @@
             class="border-t border-slate-800"
           >
             <td class="px-3 py-2">{{ u.name }}</td>
-            <td class="px-3 py-2">{{ u.email }}</td>
-            <td class="px-3 py-2">{{ u.phone }}</td>
+            <td class="px-3 py-2">{{ u.company }}</td>
+            <td class="px-3 py-2">{{ u.phoneNumber }}</td>
+            <td class="px-3 py-2">
+              {{ u.sysId }}
+            </td>
             <td class="px-3 py-2">
               <RouterLink
                 :to="{ name: 'user-detail', params: { sysId: u.sysId } }"
                 class="text-indigo-400 hover:underline"
                 @click="selectUser(u)"
               >
-                {{ u.sysId }}
+                {{ u.qrId }}
               </RouterLink>
             </td>
-            <td class="px-3 py-2">{{ u.qrId }}</td>
             <td class="px-3 py-2">{{ formatDate(u.createdAt) }}</td>
           </tr>
         </tbody>
@@ -184,5 +187,6 @@ onMounted(() => {
   }
   if (!startDate.value) startDate.value = dayjs().format("YYYY-MM-DD");
   load();
+  console.log(rows.value);
 });
 </script>

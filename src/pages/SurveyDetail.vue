@@ -17,7 +17,9 @@
       <div><span class="text-slate-400">QR:</span> {{ survey.qrId }}</div>
       <div><span class="text-slate-400">sysId:</span> {{ survey.sysId }}</div>
       <div><span class="text-slate-400">Name:</span> {{ survey.name }}</div>
-      <div><span class="text-slate-400">Email:</span> {{ survey.email }}</div>
+      <div>
+        <span class="text-slate-400">Phone:</span> {{ survey.phoneNumber }}
+      </div>
       <div>
         <span class="text-slate-400">Company:</span> {{ survey.company }}
       </div>
