@@ -207,4 +207,75 @@ onMounted(() => {
   if (!startDate.value) startDate.value = dayjs().format("YYYY-MM-DD");
   load();
 });
+
+// --- CSV export helpers ---
+function mapRow(r) {
+  return {
+    "Survey ID": r.surveyId || "",
+    QR: r.qrId || "",
+    Name: r.name || "",
+    Company: r.company || "",
+    Phone: r.phoneE164 || "",
+    Interest: r.interest || "",
+    Idea: r.thoughtsOnStc || "",
+    Submitted: r.submittedAt
+      ? dayjs(r.submittedAt).format("YYYY-MM-DD HH:mm")
+      : "",
+  };
+}
+function csvEscape(val) {
+  const s = (val ?? "").toString();
+  if (/[",\n]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+function buildCSV(data) {
+  const rows = data.map(mapRow);
+  const headers = Object.keys(rows[0] || {});
+  const lines = [
+    headers.join(","),
+    ...rows.map((row) => headers.map((h) => csvEscape(row[h])).join(",")),
+  ];
+  // BOM for Excel + RTL safety
+  return "\ufeff" + lines.join("\n");
+}
+function saveCSV(filename, csvString) {
+  try {
+    if (typeof downloadCSV === "function")
+      return downloadCSV(filename, csvString);
+  } catch (_) {}
+  // Fallback
+  const blob = new Blob([csvString], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// --- Button handlers ---
+function doExport(data, label) {
+  if (!data || !data.length) return;
+  let csv;
+  try {
+    // Prefer your util if it exists and supports plain arrays
+    if (typeof toCSV === "function") {
+      csv = toCSV(data.map(mapRow));
+    }
+  } catch (_) {}
+  if (!csv) csv = buildCSV(data);
+
+  const fname = `${label}_${dayjs().format("YYYYMMDD_HHmm")}.csv`;
+  saveCSV(fname, csv);
+}
+
+function exportAll() {
+  doExport(sortedRows.value, "surveys_all_filtered");
+}
+
+function exportPage() {
+  doExport(paginatedRows.value, `surveys_page_${page.value}`);
+}
 </script>

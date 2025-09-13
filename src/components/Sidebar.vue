@@ -25,6 +25,11 @@
       <RouterLink to="/quiz" class="block px-3 py-2 rounded hover:bg-slate-800"
         >Quiz</RouterLink
       >
+      <RouterLink
+        to="/raffle"
+        class="block px-3 py-2 rounded hover:bg-slate-800"
+        >Raffle</RouterLink
+      >
     </nav>
   </aside>
 </template>

@@ -6,9 +6,9 @@
         <header
           class="h-14 px-4 flex items-center justify-between bg-slate-900 border-b border-slate-800"
         >
-          <div class="font-semibold">STC Admin Dashboard</div>
+          <div class="font-semibold">Admin Dashboard</div>
           <div class="flex items-center gap-3">
-            <RouterLink
+            <!-- <RouterLink
               to="/analytics"
               class="text-sm text-slate-300 hover:text-white"
               >Analytics</RouterLink
@@ -27,7 +27,7 @@
               to="/quiz"
               class="text-sm text-slate-300 hover:text-white"
               >Quiz</RouterLink
-            >
+            > -->
             <button
               @click="logout"
               class="ml-4 text-sm px-3 py-1.5 rounded-md bg-indigo-600 text-white hover:bg-indigo-500"
