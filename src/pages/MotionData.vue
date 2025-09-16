@@ -160,7 +160,7 @@ function formatDate(dt) {
 async function loadMotionData() {
   try {
     // Load the CSV data
-    const response = await fetch('./src/data/MotionVM_15092025.csv');
+    const response = await fetch('./src/assets/data/MotionVM_15092025.csv');
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
