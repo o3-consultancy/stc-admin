@@ -24,7 +24,7 @@
         <span class="text-slate-400">Company:</span> {{ survey.company }}
       </div>
       <div>
-        <span class="text-slate-400">Submitted:</span> {{ survey.submittedAt }}
+        <span class="text-slate-400">Submitted:</span> {{ formatDate(survey.submittedAt) }}
       </div>
     </div>
 
@@ -50,8 +50,13 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useSelectionStore } from "../store/selection";
+import { formatToDisplayTimezone } from "../utils/timezone";
 
 const route = useRoute();
 const selection = useSelectionStore();
 const survey = selection.getSurvey(route.params.id);
+
+function formatDate(dt) {
+  return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
+}
 </script>

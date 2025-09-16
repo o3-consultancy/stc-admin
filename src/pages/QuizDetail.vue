@@ -18,7 +18,7 @@
         {{ quiz.correctAnswers }}
       </div>
       <div>
-        <span class="text-slate-400">Submitted:</span> {{ quiz.submittedAt }}
+        <span class="text-slate-400">Submitted:</span> {{ formatDate(quiz.submittedAt) }}
       </div>
     </div>
 
@@ -34,8 +34,13 @@
 <script setup>
 import { useRoute } from "vue-router";
 import { useSelectionStore } from "../store/selection";
+import { formatToDisplayTimezone } from "../utils/timezone";
 
 const route = useRoute();
 const selection = useSelectionStore();
 const quiz = selection.getQuizByIdParam(route.params.id);
+
+function formatDate(dt) {
+  return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
+}
 </script>

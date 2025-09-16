@@ -10,6 +10,7 @@ import SurveyDetail from '../pages/SurveyDetail.vue'
 import QuizDetail from '../pages/QuizDetail.vue'
 import UserDetail from '../pages/UserDetail.vue'
 import Raffle from '../pages/Raffle.vue'
+import MotionData from '../pages/MotionData.vue'
 
 const routes = [
     { path: '/login', name: 'login', component: Login },
@@ -22,6 +23,7 @@ const routes = [
             { path: 'users', name: 'users', component: UsersList },
             { path: 'surveys', name: 'surveys', component: SurveysList },
             { path: 'quiz', name: 'quiz', component: QuizList },
+            { path: 'motion', name: 'motion', component: MotionData },
             { path: 'raffle', name: 'raffle', component: Raffle },
             { path: 'surveys/:id', name: 'survey-detail', component: SurveyDetail, props: true },
             { path: 'quiz/:id', name: 'quiz-detail', component: QuizDetail, props: true },

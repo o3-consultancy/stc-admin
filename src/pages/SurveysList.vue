@@ -138,6 +138,7 @@ import dayjs from "dayjs";
 import { toCSV, downloadCSV } from "../utils/csv";
 import { useDataTable } from "../composables/useDataTable";
 import { useSelectionStore } from "../store/selection";
+import { formatToDisplayTimezone, getCurrentDateInDisplayTimezone, convertDateForAPI } from "../utils/timezone";
 
 const SortIcon = {
   props: { active: Boolean, dir: String },
@@ -179,7 +180,7 @@ function setDates({ startDate: s, endDate: e }) {
   load();
 }
 function formatDate(dt) {
-  return dt ? dayjs(dt).format("YYYY-MM-DD HH:mm") : "";
+  return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
 }
 function selectSurvey(s) {
   selection.setSurvey(s);
@@ -188,7 +189,10 @@ function selectSurvey(s) {
 async function load() {
   if (!startDate.value) return;
   const res = await apiGet("/api/surveys/list", {
-    params: { startDate: startDate.value, endDate: endDate.value || undefined },
+    params: { 
+      startDate: convertDateForAPI(startDate.value), 
+      endDate: endDate.value ? convertDateForAPI(endDate.value) : undefined 
+    },
   });
   rows.value = (res.data || []).map((r) => ({
     ...r,
@@ -204,7 +208,7 @@ onMounted(() => {
     startDate.value = d.startDate || "";
     endDate.value = d.endDate || "";
   }
-  if (!startDate.value) startDate.value = dayjs().format("YYYY-MM-DD");
+  if (!startDate.value) startDate.value = getCurrentDateInDisplayTimezone("YYYY-MM-DD");
   load();
 });
 
@@ -219,7 +223,7 @@ function mapRow(r) {
     Interest: r.interest || "",
     Idea: r.thoughtsOnStc || "",
     Submitted: r.submittedAt
-      ? dayjs(r.submittedAt).format("YYYY-MM-DD HH:mm")
+      ? formatToDisplayTimezone(r.submittedAt, "YYYY-MM-DD HH:mm")
       : "",
   };
 }
@@ -267,7 +271,7 @@ function doExport(data, label) {
   } catch (_) {}
   if (!csv) csv = buildCSV(data);
 
-  const fname = `${label}_${dayjs().format("YYYYMMDD_HHmm")}.csv`;
+  const fname = `${label}_${new Date().toISOString().slice(0, 19).replace(/:/g, '-')}.csv`;
   saveCSV(fname, csv);
 }
 

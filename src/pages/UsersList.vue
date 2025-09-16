@@ -122,6 +122,7 @@ import dayjs from "dayjs";
 import { toCSV, downloadCSV } from "../utils/csv";
 import { useDataTable } from "../composables/useDataTable";
 import { useSelectionStore } from "../store/selection";
+import { formatToDisplayTimezone, getCurrentDateInDisplayTimezone, convertDateForAPI } from "../utils/timezone";
 
 const SortIcon = {
   props: { active: Boolean, dir: String },
@@ -163,7 +164,7 @@ function setDates({ startDate: s, endDate: e }) {
   load();
 }
 function formatDate(dt) {
-  return dt ? dayjs(dt).format("YYYY-MM-DD HH:mm") : "";
+  return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
 }
 function selectUser(u) {
   selection.setUser(u);
@@ -172,7 +173,10 @@ function selectUser(u) {
 async function load() {
   if (!startDate.value) return;
   const res = await apiGet("/api/users/list", {
-    params: { startDate: startDate.value, endDate: endDate.value || undefined },
+    params: { 
+      startDate: convertDateForAPI(startDate.value), 
+      endDate: endDate.value ? convertDateForAPI(endDate.value) : undefined 
+    },
   });
   rows.value = res.data || [];
   selection.primeFromArray(rows.value);
@@ -185,7 +189,7 @@ onMounted(() => {
     startDate.value = d.startDate || "";
     endDate.value = d.endDate || "";
   }
-  if (!startDate.value) startDate.value = dayjs().format("YYYY-MM-DD");
+  if (!startDate.value) startDate.value = getCurrentDateInDisplayTimezone("YYYY-MM-DD");
   load();
   console.log(rows.value);
 });
