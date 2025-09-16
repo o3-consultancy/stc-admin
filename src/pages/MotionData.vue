@@ -132,40 +132,74 @@ function formatDate(dt) {
   // Motion data timestamps are already in UTC+3, so we can display them directly
   if (!dt) return "";
   
-  // If it's already a proper ISO string, use the timezone utility
-  if (typeof dt === 'string' && dt.includes('T')) {
-    return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
+  try {
+    // If it's already a proper ISO string, use the timezone utility
+    if (typeof dt === 'string' && dt.includes('T')) {
+      return formatToDisplayTimezone(dt, "YYYY-MM-DD HH:mm");
+    }
+    
+    // If it's the original timestamp string format, try to parse it
+    if (typeof dt === 'string' && dt.includes('PM') && dt.includes('/')) {
+      const parsed = parseMotionTimestamp(dt);
+      if (parsed) {
+        return formatToDisplayTimezone(parsed, "YYYY-MM-DD HH:mm");
+      }
+      // If parsing failed, return the original string
+      return dt;
+    }
+    
+    // For parsed timestamps, format directly
+    const formatted = dayjs(dt).format("YYYY-MM-DD HH:mm");
+    return formatted === 'Invalid Date' ? "" : formatted;
+  } catch (error) {
+    console.error('Error formatting date:', dt, error);
+    return dt || "";
   }
-  
-  // For parsed timestamps, format directly
-  return dayjs(dt).format("YYYY-MM-DD HH:mm");
 }
 
 async function loadMotionData() {
   try {
     // Load the CSV data
-    const response = await fetch('/src/data/MotionVM_15092025.csv');
+    const response = await fetch('./src/data/MotionVM_15092025.csv');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
     const csvText = await response.text();
     
     // Parse CSV
     const lines = csvText.split('\n');
-    const headers = lines[0].split(',');
+    const headers = lines[0].split(',').map(h => h.trim());
     const data = [];
+    
+    console.log('CSV Headers:', headers);
+    console.log('First few lines:', lines.slice(0, 5));
     
     for (let i = 1; i < lines.length; i++) {
       if (lines[i].trim()) {
-        const values = lines[i].split(',');
+        // Simple CSV parsing - split by comma and trim
+        const values = lines[i].split(',').map(v => v.trim());
         const row = {};
         headers.forEach((header, index) => {
-          row[header.trim()] = values[index]?.trim() || '';
+          row[header] = values[index] || '';
         });
         
         // Convert timestamp strings to proper date format for sorting
+        // Handle the typo in the CSV header ("Registed" instead of "Registered")
         if (row['Registed Timestamp']) {
           row.registeredTimestamp = parseMotionTimestamp(row['Registed Timestamp']);
+          // Fallback to original string if parsing failed
+          if (!row.registeredTimestamp) {
+            row.registeredTimestamp = row['Registed Timestamp'];
+          }
+          console.log('Parsed registered timestamp:', row['Registed Timestamp'], '->', row.registeredTimestamp);
         }
         if (row['Game End Timestamp']) {
           row.gameEndTimestamp = parseMotionTimestamp(row['Game End Timestamp']);
+          // Fallback to original string if parsing failed
+          if (!row.gameEndTimestamp) {
+            row.gameEndTimestamp = row['Game End Timestamp'];
+          }
+          console.log('Parsed game end timestamp:', row['Game End Timestamp'], '->', row.gameEndTimestamp);
         }
         
         // Map to consistent field names
@@ -177,6 +211,7 @@ async function loadMotionData() {
       }
     }
     
+    console.log('Loaded motion data:', data.slice(0, 3)); // Log first 3 rows
     rows.value = data;
     resetPage();
   } catch (error) {
@@ -187,11 +222,11 @@ async function loadMotionData() {
 
 function parseMotionTimestamp(timestampStr) {
   // Parse format like "03:38:29 PM 13/09/2025"
-  if (!timestampStr) return null;
+  if (!timestampStr || !timestampStr.trim()) return null;
   
   try {
-    // Split the timestamp
-    const parts = timestampStr.split(' ');
+    // Split the timestamp by spaces
+    const parts = timestampStr.trim().split(' ');
     if (parts.length >= 4) {
       const timePart = parts.slice(0, 3).join(' '); // "03:38:29 PM"
       const datePart = parts[3]; // "13/09/2025"
@@ -199,15 +234,18 @@ function parseMotionTimestamp(timestampStr) {
       // Parse date (DD/MM/YYYY)
       const dateParts = datePart.split('/');
       if (dateParts.length === 3) {
-        const day = dateParts[0];
-        const month = dateParts[1];
+        const day = dateParts[0].padStart(2, '0');
+        const month = dateParts[1].padStart(2, '0');
         const year = dateParts[2];
         
-        // Create a proper date string
-        const dateStr = `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')} ${timePart}`;
+        // Create a proper date string in ISO format
+        const dateStr = `${year}-${month}-${day} ${timePart}`;
         
-        // Parse and return as ISO string
-        return new Date(dateStr).toISOString();
+        // Parse using dayjs for better compatibility
+        const parsedDate = dayjs(dateStr, 'YYYY-MM-DD hh:mm:ss A');
+        if (parsedDate.isValid()) {
+          return parsedDate.toISOString();
+        }
       }
     }
   } catch (error) {
