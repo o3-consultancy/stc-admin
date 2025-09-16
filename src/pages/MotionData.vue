@@ -159,12 +159,9 @@ function formatDate(dt) {
 
 async function loadMotionData() {
   try {
-    // Load the CSV data
-    const response = await fetch('./src/assets/data/MotionVM_15092025.csv');
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
-    }
-    const csvText = await response.text();
+    // Import the CSV file as a module - this ensures it gets copied to dist
+    const csvModule = await import('../assets/data/MotionVM_15092025.csv?raw');
+    const csvText = csvModule.default;
     
     // Parse CSV
     const lines = csvText.split('\n');
